@@ -12,6 +12,7 @@
 #include "RedBot.h"
 #include "Motor.h"
 #include "RobotSound.h"
+#include "PIDController.h"
 
 namespace RobotDev {
 
@@ -27,22 +28,13 @@ struct vectors {
 };
 
 
-
-class Controller {
-public:
-	float E_k;
-	float e_k_l;
-	const float Kp = 0.08;
-	const float Ki = 0.01;
-	const float Kd = 0.02;
-};
-
 class Robot {
 private:
 	const int countsPerRev = 192;
 	const float R = 0.032;
 	const float L = 0.165;
 	const float stopDistanceSquared = 0.01;
+	const int bumpThreshold = 70;
 
 	int lCount;
 	int rCount;
@@ -53,12 +45,13 @@ private:
 	vector pos;
 	float theta;
 
-	Controller cntrl;
+	PIDController cntrl;
+	RobotSound sound;
 	Motor motor;
 	RedBotEncoder encoder = RedBotEncoder(A2, 10);
-	RobotSound sound;
 	RedBotBumper lBumper = RedBotBumper(3);
 	RedBotBumper rBumper = RedBotBumper(11);
+	RedBotAccel accel;
 
 
 	float v_s;

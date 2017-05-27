@@ -15,6 +15,8 @@ namespace RobotDev {
 Robot::Robot() {
 	v_s = 0.02;
 	started = false;
+	accel.enableBump();
+	accel.setBumpThresh(bumpThreshold);
 }
 
 Robot::~Robot() {
@@ -65,19 +67,11 @@ void Robot::control(float dt)
 
 		// angle error
 		float e_k = theta_gtg - theta;
+
 		e_k = atan2(sin(e_k), cos(e_k));
 
-		// errors for PID controller
-		float e_P = e_k;
-		float e_I = cntrl.E_k + e_k * dt;
-		float e_D = (e_k - cntrl.e_k_l) / dt;
-
 		// angle speed from PID controller
-		w = cntrl.Kp * e_P + cntrl.Ki * e_I + cntrl.Kd * e_D;
-
-		cntrl.e_k_l = e_k;
-
-		cntrl.E_k = e_I;
+		w = cntrl.calc(e_k, dt);
 
 		// speed for right and left wheel to set angle speed from controller
 		if (u_gtg[0]*u_gtg[0] + u_gtg[1]*u_gtg[1] > stopDistanceSquared) {
@@ -104,26 +98,36 @@ void Robot::actuate(float dt)
 
 void Robot::checkState(float dt)
 {
-	static float stuck_time = 0.0;
+	// stops the robot in case of crash
+	if (started) {
+		// wheels are stuck --> stop
+		static float stuck_time = 0.0;
 
-	if (started && v_l == 0 && v_r == 0) {
-		stuck_time += dt;
+		if (v_l == 0 && v_r == 0) {
+			stuck_time += dt;
 
-		if (stuck_time > 0.5) {
-			stop();
-			sound.start(2000, 1);
+			if (stuck_time > 0.5) {
+				stop();
+				sound.start(2000, 1);
+			}
+		} else {
+			stuck_time = 0.0;
 		}
-	} else {
-		stuck_time = 0.0;
-	}
 
-	// stop if robot collides with obstacle
-	int lBumperState = lBumper.read();
-	int rBumperState = rBumper.read();
+		// bumper --> stop
+		int lBumperState = lBumper.read();
+		int rBumperState = rBumper.read();
 
-	if ((lBumperState == LOW) || (rBumperState == LOW)) {
-		stop();
-		sound.start(500, 1);
+		if ((lBumperState == LOW) || (rBumperState == LOW)) {
+			stop();
+			sound.start(500, 1);
+		}
+
+		// accelerometer detects bump --> stop
+		if (accel.checkBump()) {
+			stop();
+			sound.start(200, 1);
+		}
 	}
 }
 
