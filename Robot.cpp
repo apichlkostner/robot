@@ -13,8 +13,6 @@
 namespace RobotDev {
 
 Robot::Robot() {
-	goal[0] = 0.5;
-	goal[1] = 0.5;
 	v_s = 0.02;
 	started = false;
 }
@@ -49,8 +47,8 @@ void Robot::updateState(float dt)
 	theta += omega * dt;
 	theta = atan2(sin(theta), cos(theta));
 
-	pos[0] += v_x * dt;
-	pos[1] += v_y * dt;
+	pos.x += v_x * dt;
+	pos.y += v_y * dt;
 }
 
 void Robot::control(float dt)
@@ -58,8 +56,8 @@ void Robot::control(float dt)
 	if (started) {
 		// vector from robot to goal
 		float u_gtg[2] = {
-				route.v[route.i].x - pos[0],
-				route.v[route.i].y - pos[1]
+				route.v[route.i].x - pos.x,
+				route.v[route.i].y - pos.y
 		};
 
 		// delta angle between robot heading and vector to goal
@@ -160,9 +158,9 @@ void Robot::stop()
 
 void Robot::printDebug()
 {
-	Serial.print(pos[0]);
+	Serial.print(pos.x);
 	Serial.print("\t");
-	Serial.print(pos[1]);
+	Serial.print(pos.y);
 	Serial.print("\t");
 	Serial.println(theta);
 
@@ -178,9 +176,9 @@ void Robot::printDebug()
 	Serial.print("\t");
 	Serial.println(route.i);
 
-	Serial.print(goal[0]);
+	Serial.print(route.v[route.i].x);
 	Serial.print("\t");
-	Serial.print(goal[1]);
+	Serial.print(route.v[route.i].y);
 	Serial.print("\t");
 	Serial.println(w);
 

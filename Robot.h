@@ -50,10 +50,8 @@ private:
 	float v_l;
 	float v_r;
 
-	float pos[2];
+	vector pos;
 	float theta;
-
-	float goal[2];
 
 	Controller cntrl;
 	Motor motor;
