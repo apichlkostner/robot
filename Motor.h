@@ -2,7 +2,7 @@
  * Motor.h
  *
  *  Created on: 26.05.2017
- *      Author: arthur
+ *      Author: Arthur Pichlkostner
  */
 
 #ifndef MOTOR_H_
@@ -23,6 +23,6 @@ public:
 	void setSpeeds(float v_l, float v_r);
 };
 
-} /* namespace robot */
+} /* namespace RobotDev */
 
 #endif /* MOTOR_H_ */

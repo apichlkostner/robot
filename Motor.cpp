@@ -47,4 +47,4 @@ void Motor::setSpeeds(float v_l, float v_r)
 	rightDrive(pwm_r);
 }
 
-} /* namespace robot */
+} /* namespace RobotDev */

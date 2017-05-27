@@ -9,19 +9,13 @@ using namespace std;
 
 #define MS2US(t) (1000ul * (t))
 
-
-RedBotEncoder encoder = RedBotEncoder(A2, 10);
 int buttonPin = 12;
-
-RedBotBumper lBumper = RedBotBumper(3);  // initialzes bumper object on pin 3
-RedBotBumper rBumper = RedBotBumper(11); // initialzes bumper object on pin 11
-
 
 static int doPrint;
 
 struct vector waypoints[] = {
-		{0.5, 0.0},
-		{1.0, 0.5},
+		{1.0, 0.0},
+		{0.0, 0.0},
 };
 
 // route the robot should follow
@@ -43,29 +37,17 @@ void setup()
 
 void loop(unsigned long delta_t)
 {
+	float dt = ((float)delta_t) * 0.000001;
+
 	// wait for a button press to start
 	if (digitalRead(buttonPin) == LOW) {
-		encoder.clearEnc(BOTH);
 		robot.start();
 	}
 
-	float dt = ((float)delta_t) * 0.000001;
-
-	robot.sense(dt);
-	robot.updateState(dt);
-	robot.control(dt);
-	robot.actuate(dt);
+	robot.controlCycle(dt);
 
 	if ((doPrint++ % 3 == 0))
 		robot.printDebug();
-
-	// stop if robot collides with obstacle
-	int lBumperState = lBumper.read();
-	int rBumperState = rBumper.read();
-
-	if ((lBumperState == LOW) || (rBumperState == LOW)) {
-		robot.stop();
-	}
 }
 
 int main(void) {

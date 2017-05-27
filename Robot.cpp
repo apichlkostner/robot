@@ -2,7 +2,7 @@
  * robot.cpp
  *
  *  Created on: 26.05.2017
- *      Author: arthur
+ *      Author: Arthur Pichlkostner
  */
 
 #include "Robot.h"
@@ -81,10 +81,8 @@ void Robot::control(float dt)
 
 		cntrl.E_k = e_I;
 
-
 		// speed for right and left wheel to set angle speed from controller
-
-		if (u_gtg[0]*u_gtg[0] + u_gtg[1]*u_gtg[1] > 0.1) {
+		if (u_gtg[0]*u_gtg[0] + u_gtg[1]*u_gtg[1] > stopDistanceSquared) {
 			v_r_s = (2*v_s + w*L) / (2*R);
 			v_l_s = (2*v_s - w*L) / (2*R);
 		} else {
@@ -105,6 +103,43 @@ void Robot::actuate(float dt)
 	else
 		motor.brake();
 }
+
+void Robot::checkState(float dt)
+{
+	static float stuck_time = 0.0;
+
+	if (started && v_l == 0 && v_r == 0) {
+		stuck_time += dt;
+
+		if (stuck_time > 0.5) {
+			stop();
+			sound.start(2000, 1);
+		}
+	} else {
+		stuck_time = 0.0;
+	}
+
+	// stop if robot collides with obstacle
+	int lBumperState = lBumper.read();
+	int rBumperState = rBumper.read();
+
+	if ((lBumperState == LOW) || (rBumperState == LOW)) {
+		stop();
+		sound.start(500, 1);
+	}
+}
+
+void Robot::controlCycle(float dt)
+{
+	sense(dt);
+	updateState(dt);
+	checkState(dt);
+	control(dt);
+	actuate(dt);
+	sound.process(dt);
+}
+
+
 
 void Robot::setRoute(struct vectors v)
 {
@@ -158,4 +193,4 @@ void Robot::printDebug()
 	Serial.println("");
 }
 
-} /* namespace robot */
+} /* namespace RobotDev */
