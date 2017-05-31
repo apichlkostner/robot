@@ -5,7 +5,6 @@
 #include "Robot.h"
 
 using namespace RobotDev;
-using namespace std;
 
 #define MS2US(t) (1000ul * (t))
 
@@ -59,7 +58,7 @@ int main(void) {
 		current_time = micros();
 		unsigned long delta_t = (current_time - last_time);
 
-		if (delta_t > MS2US(100ul)) {
+		if (delta_t > MS2US(50ul)) {
 			last_time = current_time;
 			loop(delta_t);
 			//Serial.println(micros() - current_time);

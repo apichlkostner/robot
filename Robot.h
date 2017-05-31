@@ -13,6 +13,7 @@
 #include "Motor.h"
 #include "RobotSound.h"
 #include "PIDController.h"
+#include "DistanceSensor.h"
 
 namespace RobotDev {
 
@@ -48,6 +49,7 @@ private:
 	PIDController cntrl;
 	RobotSound sound;
 	Motor motor;
+	DistanceSensor d_sensors[2] = {DistanceSensor(A0), DistanceSensor(A1)};
 	RedBotEncoder encoder = RedBotEncoder(A2, 10);
 	RedBotBumper lBumper = RedBotBumper(3);
 	RedBotBumper rBumper = RedBotBumper(11);

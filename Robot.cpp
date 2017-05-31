@@ -8,8 +8,6 @@
 #include "Robot.h"
 #include <math.h>
 
-//using namespace std;
-
 namespace RobotDev {
 
 Robot::Robot() {
@@ -57,13 +55,13 @@ void Robot::control(float dt)
 {
 	if (started) {
 		// vector from robot to goal
-		float u_gtg[2] = {
+		vector u_gtg = {
 				route.v[route.i].x - pos.x,
 				route.v[route.i].y - pos.y
 		};
 
 		// delta angle between robot heading and vector to goal
-		float theta_gtg = atan2(u_gtg[1], u_gtg[0]);
+		float theta_gtg = atan2(u_gtg.y, u_gtg.x);
 
 		// angle error
 		float e_k = theta_gtg - theta;
@@ -74,15 +72,13 @@ void Robot::control(float dt)
 		w = cntrl.calc(e_k, dt);
 
 		// speed for right and left wheel to set angle speed from controller
-		if (u_gtg[0]*u_gtg[0] + u_gtg[1]*u_gtg[1] > stopDistanceSquared) {
+		if (u_gtg.x*u_gtg.x + u_gtg.y*u_gtg.y > stopDistanceSquared) {
 			v_r_s = (2*v_s + w*L) / (2*R);
 			v_l_s = (2*v_s - w*L) / (2*R);
 		} else {
 			route.i++;
 			if (route.i >= route.size) {
-				started = false;
-				v_r_s = 0;
-				v_l_s = 0;
+				stop();
 			}
 		}
 	}
@@ -128,6 +124,13 @@ void Robot::checkState(float dt)
 			stop();
 			sound.start(200, 1);
 		}
+
+		float front_distance = d_sensors[0].getDistance();
+
+		if (front_distance < 0.1) {
+			sound.start(1000, 1);
+			stop();
+		}
 	}
 }
 
@@ -139,9 +142,11 @@ void Robot::controlCycle(float dt)
 	control(dt);
 	actuate(dt);
 	sound.process(dt);
+
+	//	Serial.print(d_sensors[0].getDistance());
+	//	Serial.print("\t");
+	//	Serial.println(d_sensors[1].getDistance());
 }
-
-
 
 void Robot::setRoute(struct vectors v)
 {

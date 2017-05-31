@@ -2,20 +2,24 @@
  * PIDController.cpp
  *
  *  Created on: 27.05.2017
- *      Author: arthur
+ *      Author: Arthur Pichlkostner
  */
 
 #include "PIDController.h"
 
 namespace RobotDev {
 
-PIDController::PIDController() {
-	// TODO Auto-generated constructor stub
 
+PIDController::PIDController(float Kp, float Ki, float Kd) : Kp(Kp), Ki(Ki), Kd(Kd)
+{
 }
 
-PIDController::~PIDController() {
-	// TODO Auto-generated destructor stub
+PIDController::PIDController() : Kp(0.08), Ki(0.01), Kd(0.02)
+{
+}
+
+PIDController::~PIDController()
+{
 }
 
 float PIDController::calc(float e_k, float dt)
