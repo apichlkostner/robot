@@ -1,9 +1,18 @@
-/*
- * robot.cpp
- *
- *  Created on: 26.05.2017
- *      Author: Arthur Pichlkostner
- */
+//    Robot control
+//    Copyright (C) 2017 Arthur Pichlkostner <apichlkostner@gmx.de>
+//
+//    This program is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    This program is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 #include "Robot.h"
 #include <math.h>
@@ -13,8 +22,8 @@ namespace RobotDev {
 Robot::Robot() {
 	v_s = 0.02;
 	started = false;
-	accel.enableBump();
-	accel.setBumpThresh(bumpThreshold);
+	//accel.enableBump();
+	//accel.setBumpThresh(bumpThreshold);
 }
 
 Robot::~Robot() {
@@ -120,10 +129,10 @@ void Robot::checkState(float dt)
 		}
 
 		// accelerometer detects bump --> stop
-		if (accel.checkBump()) {
-			stop();
-			sound.start(200, 1);
-		}
+//		if (accel.checkBump()) {
+//			stop();
+//			sound.start(200, 1);
+//		}
 
 		float front_distance = d_sensors[2].getDistance();
 

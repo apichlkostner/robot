@@ -14,37 +14,26 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-#include "DistanceSensor.h"
+#ifndef CURVE_H_
+#define CURVE_H_
 
 namespace RobotDev {
 
-DistanceSensor::DistanceSensor() {
-	DistanceSensor(A0);
-}
+class Curve {
 
-DistanceSensor::DistanceSensor(uint8_t pin) {
-	curve = Curve(volt, dist, LEN_CURVE);
-	this->pin = pin;
-}
+protected:
+	const float *x;
+	const float *y;
+	int size;
 
-DistanceSensor::~DistanceSensor() {
-	// TODO Auto-generated destructor stub
-}
+public:
+	Curve();
+	Curve(const float *x, const float *y, const int size);
+	virtual ~Curve();
 
-float DistanceSensor::getDistance() {
-	int sensor_adc = analogRead(pin);
-	float sensor_volt = sensor_adc * 5.0 / 1024;
-
-//	int pos = 0;
-//	while (sensor_volt < volt[pos])
-//		pos++;
-//
-//	float delta_dist = dist[pos] - dist[pos-1];
-//	float delta_volt = volt[pos-1] - volt[pos];
-//
-//	float distance = dist[pos-1] + delta_dist * (volt[pos-1] - sensor_volt) / delta_volt;
-
-	return curve.getVal(sensor_volt);
-}
+	float getVal(float x);
+};
 
 } /* namespace RobotDev */
+
+#endif /* CURVE_H_ */
