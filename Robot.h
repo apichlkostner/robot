@@ -49,7 +49,7 @@ private:
 	PIDController cntrl;
 	RobotSound sound;
 	Motor motor;
-	DistanceSensor d_sensors[2] = {DistanceSensor(A0), DistanceSensor(A1)};
+	DistanceSensor d_sensors[5] = {DistanceSensor(A3), DistanceSensor(A1), DistanceSensor(A0), DistanceSensor(A4),DistanceSensor(A5)};
 	RedBotEncoder encoder = RedBotEncoder(A2, 10);
 	RedBotBumper lBumper = RedBotBumper(3);
 	RedBotBumper rBumper = RedBotBumper(11);

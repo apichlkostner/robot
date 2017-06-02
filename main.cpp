@@ -45,7 +45,7 @@ void loop(unsigned long delta_t)
 
 	robot.controlCycle(dt);
 
-	if ((doPrint++ % 3 == 0))
+	if ((doPrint++ % 5 == 0))
 		robot.printDebug();
 }
 
@@ -58,7 +58,7 @@ int main(void) {
 		current_time = micros();
 		unsigned long delta_t = (current_time - last_time);
 
-		if (delta_t > MS2US(50ul)) {
+		if (delta_t > MS2US(100ul)) {
 			last_time = current_time;
 			loop(delta_t);
 			//Serial.println(micros() - current_time);

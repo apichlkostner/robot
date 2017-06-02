@@ -125,7 +125,7 @@ void Robot::checkState(float dt)
 			sound.start(200, 1);
 		}
 
-		float front_distance = d_sensors[0].getDistance();
+		float front_distance = d_sensors[2].getDistance();
 
 		if (front_distance < 0.1) {
 			sound.start(1000, 1);
@@ -142,10 +142,6 @@ void Robot::controlCycle(float dt)
 	control(dt);
 	actuate(dt);
 	sound.process(dt);
-
-	//	Serial.print(d_sensors[0].getDistance());
-	//	Serial.print("\t");
-	//	Serial.println(d_sensors[1].getDistance());
 }
 
 void Robot::setRoute(struct vectors v)
@@ -167,6 +163,13 @@ void Robot::stop()
 
 void Robot::printDebug()
 {
+#if 1
+	for (int i=0; i<5; i++) {
+		Serial.print(d_sensors[i].getDistance());
+		Serial.print("\t");
+	}
+	Serial.println("");
+#else
 	Serial.print(pos.x);
 	Serial.print("\t");
 	Serial.print(pos.y);
@@ -198,6 +201,7 @@ void Robot::printDebug()
 	Serial.println(v_s);
 
 	Serial.println("");
+#endif
 }
 
 } /* namespace RobotDev */
