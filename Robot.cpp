@@ -22,12 +22,13 @@ namespace RobotDev {
 Robot::Robot() {
 	v_s = 0.02;
 	started = false;
-	//accel.enableBump();
-	//accel.setBumpThresh(bumpThreshold);
+#if ROBOTDEV_ACCELEROMETER_INSTALLED
+	accel.enableBump();
+	accel.setBumpThresh(bumpThreshold);
+#endif
 }
 
 Robot::~Robot() {
-	// TODO Auto-generated destructor stub
 }
 
 
@@ -119,6 +120,7 @@ void Robot::checkState(float dt)
 			stuck_time = 0.0;
 		}
 
+#if ROBOTDEV_BUMPER_INSTALLED
 		// bumper --> stop
 		int lBumperState = lBumper.read();
 		int rBumperState = rBumper.read();
@@ -127,12 +129,15 @@ void Robot::checkState(float dt)
 			stop();
 			sound.start(500, 1);
 		}
+#endif
 
+#if ROBOTDEV_ACCELEROMETER_INSTALLED
 		// accelerometer detects bump --> stop
-//		if (accel.checkBump()) {
-//			stop();
-//			sound.start(200, 1);
-//		}
+		if (accel.checkBump()) {
+			stop();
+			sound.start(200, 1);
+		}
+#endif
 
 		float front_distance = d_sensors[2].getDistance();
 

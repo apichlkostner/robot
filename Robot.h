@@ -19,10 +19,19 @@
 
 #include <Arduino.h>
 #include "RedBot.h"
+#include "RobotConfig.h"
 #include "Motor.h"
 #include "RobotSound.h"
 #include "PIDController.h"
 #include "DistanceSensor.h"
+
+#ifndef ROBOTDEV_BUMPER_INSTALLED
+#error "ROBOTDEV_BUMPER_INSTALLED" not defined. Please configure in RobotConfig.h
+#endif
+#ifndef ROBOTDEV_ACCELEROMETER_INSTALLED
+#error "ROBOTDEV_ACCELEROMETER_INSTALLED" not defined. Please configure in RobotConfig.h
+#endif
+
 
 namespace RobotDev {
 
@@ -58,12 +67,15 @@ private:
 	PIDController cntrl;
 	RobotSound sound;
 	Motor motor;
-	DistanceSensor d_sensors[5] = {DistanceSensor(A3), DistanceSensor(A1), DistanceSensor(A0), DistanceSensor(A4),DistanceSensor(A5)};
+	DistanceSensor d_sensors[5] = {DistanceSensor(A3), DistanceSensor(A1), DistanceSensor(A0), DistanceSensor(A6),DistanceSensor(A7)};
 	RedBotEncoder encoder = RedBotEncoder(A2, 10);
+#if ROBOTDEV_BUMPER_INSTALLED
 	RedBotBumper lBumper = RedBotBumper(3);
 	RedBotBumper rBumper = RedBotBumper(11);
-	//RedBotAccel accel;
-
+#endif
+#if ROBOTDEV_ACCELEROMETER_INSTALLED
+	RedBotAccel accel;
+#endif
 
 	float v_s;
 	float v_r_s;
