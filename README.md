@@ -8,3 +8,5 @@ The build uses the arduino-mk package (https://github.com/sudar/Arduino-Makefile
 make upload
 ```
 builds the project and uploads to the Arduino.
+
+![Robot](pictures/robot.jpg)
