@@ -1,7 +1,7 @@
 CXX = g++
 INCLUDES= -I./
-CXXFLAGS = -g $(INCLUDES)
-SRCM= ../Curve.cpp
+CXXFLAGS = -g $(INCLUDES) -std=c++11
+SRCM= ../Curve.cpp ../MatrixR.cpp
 OBJM = $(SRCM:.cpp=.o)
 LINKFLAGS= -lCppUTest -lCppUTestExt
 

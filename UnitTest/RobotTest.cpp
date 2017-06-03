@@ -16,13 +16,16 @@
 
 #include "RobotTest.h"
 #include "CppUTest/CommandLineTestRunner.h"
+#include <math.h>
+
 #include "../Curve.h"
+#include "../MatrixR.h"
 
 namespace RobotDevUnitTest {
 
 TEST_GROUP(Curve)
-						{
-						};
+		{
+		};
 
 TEST(Curve, FirstTest)
 {
@@ -43,16 +46,93 @@ TEST(Curve, FirstTest)
 	DOUBLES_EQUAL(7.0, curve.getVal(8), 0.00001);
 }
 
+TEST_GROUP(MatrixR)
+{
+};
+
+TEST(MatrixR, FirstTest)
+{
+	float init_1[] = {1, 0.5, 2, 0.3};
+
+	float init_2[] = {-0.5, 1, 1.3, -2};
+	float init_2_cpy[] = {-0.5, 1, 1.3, -2};
+
+	float init_result[] = {0.5, 1.5, 3.3, -1.7};
+	float init_result_mult[] = {0.15, 0.0, -0.61, 1.4};
+
+	RobotDevMath::MatrixR m1(2, 2, init_1);
+	RobotDevMath::MatrixR m2(2, 2, init_2);
+	RobotDevMath::MatrixR m2_cpy(2, 2, init_2_cpy);
+	RobotDevMath::MatrixR m_add_result(2, 2, init_result);
+	RobotDevMath::MatrixR m_mult_result(2, 2, init_result_mult);
+
+	// test access of matrix elements
+	DOUBLES_EQUAL(1.0, m1(0,0), 0.000001);
+	DOUBLES_EQUAL(0.5, m1(1,0), 0.000001);
+	DOUBLES_EQUAL(2.0, m1(0,1), 0.000001);
+	DOUBLES_EQUAL(0.3, m1(1,1), 0.000001);
+
+	DOUBLES_EQUAL(-0.5, m2(0,0), 0.000001);
+	DOUBLES_EQUAL(1.0, m2(1,0), 0.000001);
+	DOUBLES_EQUAL(1.3, m2(0,1), 0.000001);
+	DOUBLES_EQUAL(-2.0, m2(1,1), 0.000001);
+
+	// check of equality operator
+	CHECK(m2 == m2_cpy);
+	CHECK_FALSE(m2 == m1);
+
+	// check of += operator
+	m2_cpy += m1;
+	CHECK(m2_cpy == m_add_result);
+
+	// check of -= operator
+	m2_cpy -= m1;
+	CHECK(m2_cpy == m2);
+
+	// check of + operator
+	RobotDevMath::MatrixR mr = m1 + m2;
+	CHECK(mr == m_add_result);
+
+	// check of * operator
+	RobotDevMath::MatrixR mm = m1 * m2;
+	CHECK(mm == m_mult_result);
 
 
+	// positive and negative test for matrix vector multiplication
+	float init_vector[] = {0.2, 0.8};
+	float init_vector_result[] = {0.6, 0.64};
+	float init_vector_notresult[] = {0.6, 0.63};
+	RobotDevMath::MatrixR v1(1, 2, init_vector);
+	RobotDevMath::MatrixR mv = m1 * v1;
 
+	CHECK(mv == RobotDevMath::MatrixR(1, 2, init_vector_result));
+	CHECK_FALSE(mv == RobotDevMath::MatrixR(1, 2, init_vector_notresult));
 
-RobotTest::RobotTest() {
+	// translation and rotation of 2D vector in homogeneous coodinates
+	// result calculated with Matlab
+	float point[] = {5.0, 2.0, 1};  // homogeneous coordinate
+	float translation[2] = {0.2, 0.8};
+	float theta = M_PI / 4;
+	float result[] = {2.3213, 5.7497, 1.0};
 
-}
+	float transformation[] = {cos(theta), -sin(theta), translation[0],
+			                 sin(theta), cos(theta), translation[1],
+							 0, 0, 1};
+	RobotDevMath::MatrixR trans_m(3, 3, transformation);
+	RobotDevMath::MatrixR vec_p(1, 3, point);
+	RobotDevMath::MatrixR vec_n = trans_m * vec_p;
+	RobotDevMath::MatrixR vec_r(1, 3, result);
 
-RobotTest::~RobotTest() {
-}
+	CHECK(vec_n == vec_r);
+
+	}
+
+	RobotTest::RobotTest() {
+
+	}
+
+	RobotTest::~RobotTest() {
+	}
 
 
 } /* namespace RobotDevUnitTest */
