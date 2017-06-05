@@ -1,20 +1,26 @@
 CXX = g++
 INCLUDES= -I./
 CXXFLAGS = -g $(INCLUDES) -std=c++11
-SRCM= ../Curve.cpp ../MatrixR.cpp
-OBJM = $(SRCM:.cpp=.o)
+SRC= ../Curve.cpp ../MatrixR.cpp
+OBJ = Curve.o MatrixR.o
 LINKFLAGS= -lCppUTest -lCppUTestExt
 
-test: unittest
+.PHONY: default unittest clean
+
+default: unittest
 	./unittest
 
-unittest: RobotTest.cpp $(OBJM)
+unittest: RobotTest.cpp $(OBJ)
 	$(CXX) $(CXXFLAGS) -o $@ RobotTest.cpp *.o $(LINKFLAGS) $(LINKFLAGSLOG4) $(LIBLOG)
 
-# Default compile
 
-.cpp.o:
+include $(OBJ:.o=.d)
+
+%.o: ../%.cpp
 	$(CXX) $(CXXFLAGS) -c $<
-	
+
+%.d: ../%.cpp
+	$(CXX) -MM $(CFLAGS)../$*.cpp > $*.d
+
 clean:
-	rm *.o
+	rm *.o *.d unittest
