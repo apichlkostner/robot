@@ -19,6 +19,9 @@
 
 #include <Arduino.h>
 #include "Curve.h"
+#include "MatrixR.h"
+
+using namespace RobotDevMath;
 
 namespace RobotDev {
 
@@ -26,18 +29,22 @@ class DistanceSensor {
 protected:
 	uint8_t pin;
 
-	const float volt[11] = {0.0, 0.35, 0.4, 0.5, 0.6, 0.75, 0.9, 1.3, 2.3, 3.3, 5.0};
+	const float volt[11] = {0.35, 0.4, 0.5, 0.6, 0.75, 0.9, 1.3, 2.3, 3.3};
 	static const int LEN_CURVE = sizeof(volt) / sizeof(volt[0]);
-	const float dist[LEN_CURVE] = {0.8, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.05, 0};
+	const float dist[LEN_CURVE] = {0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.05};
+	const MatrixR *SensorToRobot;
 
 	Curve curve;
 
 public:
 	DistanceSensor();
 	DistanceSensor(uint8_t pin);
+	DistanceSensor(uint8_t pin, const MatrixR*);
+
 	virtual ~DistanceSensor();
 
 	float getDistance();
+	MatrixR getPosInRobotCoord();
 };
 
 } /* namespace RobotDev */

@@ -22,9 +22,10 @@ DistanceSensor::DistanceSensor() {
 	DistanceSensor(A0);
 }
 
-DistanceSensor::DistanceSensor(uint8_t pin) {
+DistanceSensor::DistanceSensor(uint8_t pin, const MatrixR *MPos) {
 	curve = Curve(volt, dist, LEN_CURVE);
 	this->pin = pin;
+	SensorToRobot = MPos;
 }
 
 DistanceSensor::~DistanceSensor() {
@@ -35,16 +36,41 @@ float DistanceSensor::getDistance() {
 	int sensor_adc = analogRead(pin);
 	float sensor_volt = sensor_adc * 5.0 / 1024;
 
-//	int pos = 0;
-//	while (sensor_volt < volt[pos])
-//		pos++;
-//
-//	float delta_dist = dist[pos] - dist[pos-1];
-//	float delta_volt = volt[pos-1] - volt[pos];
-//
-//	float distance = dist[pos-1] + delta_dist * (volt[pos-1] - sensor_volt) / delta_volt;
-
 	return curve.getVal(sensor_volt);
+}
+
+MatrixR DistanceSensor::getPosInRobotCoord()
+{
+	float dist = getDistance();
+	float dist_vec[] = {dist, 0, 1};
+	MatrixR posInSensor = MatrixR(3, 1, dist_vec);
+
+//	Serial.print(posInSensor(0,0));
+//		Serial.print("\t");
+//		Serial.print(posInSensor(0,1));
+//		Serial.print("\t");
+//		Serial.println(posInSensor(0,2));
+//
+//	Serial.print((*SensorToRobot)(0,0));
+//	Serial.print("\t");
+//	Serial.print((*SensorToRobot)(0,1));
+//	Serial.print("\t");
+//	Serial.print((*SensorToRobot)(0,2));
+//	Serial.print("\t");
+//	Serial.print((*SensorToRobot)(1,0));
+//	Serial.print("\t");
+//	Serial.print((*SensorToRobot)(1,1));
+//	Serial.print("\t");
+//	Serial.print((*SensorToRobot)(1,2));
+//	Serial.print("\t");
+//	Serial.print((*SensorToRobot)(2,0));
+//	Serial.print("\t");
+//	Serial.print((*SensorToRobot)(2,1));
+//	Serial.print("\t");
+//	Serial.println((*SensorToRobot)(2,2));
+//	Serial.println("->");
+
+	return (*SensorToRobot) * posInSensor;
 }
 
 } /* namespace RobotDev */

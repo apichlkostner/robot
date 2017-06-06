@@ -26,6 +26,8 @@ Robot::Robot() {
 	accel.enableBump();
 	accel.setBumpThresh(bumpThreshold);
 #endif
+	//d_sensors[0] = DistanceSensor(A3, leftSensorM);
+	//d_sensors = {DistanceSensor(A3, leftSensorM), DistanceSensor(A1, leftSensorM), DistanceSensor(A0, leftSensorM), DistanceSensor(A6, leftSensorM),DistanceSensor(A7, leftSensorM)}
 }
 
 Robot::~Robot() {
@@ -179,10 +181,18 @@ void Robot::printDebug()
 {
 #if 1
 	for (int i=0; i<5; i++) {
-		Serial.print(d_sensors[i].getDistance());
+		Serial.println(i);
+		MatrixR pos = d_sensors[i].getPosInRobotCoord();
+
+		//Serial.print(d_sensors[i].getDistance());
+		Serial.print(pos(0,0));
 		Serial.print("\t");
+		Serial.print(pos(1,0));
+		Serial.print("\t");
+		Serial.print(pos(2,0));
+		Serial.println("");
 	}
-	Serial.println("");
+	Serial.println("---------------");
 #else
 	Serial.print(pos.x);
 	Serial.print("\t");

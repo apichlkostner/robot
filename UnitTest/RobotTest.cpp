@@ -18,14 +18,21 @@
 #include "CppUTest/CommandLineTestRunner.h"
 #include <math.h>
 
+#include "../RobotConfig.h"
 #include "../Curve.h"
 #include "../MatrixR.h"
+#include "../DistanceSensor.h"
+
+int analogRead(int r)
+{
+	return 500;
+}
 
 namespace RobotDevUnitTest {
 
 TEST_GROUP(Curve)
-		{
-		};
+				{
+				};
 
 TEST(Curve, FirstTest)
 {
@@ -58,7 +65,7 @@ TEST(MatrixR, FirstTest)
 	float init_2_cpy[] = {-0.5, 1, 1.3, -2};
 
 	float init_result[] = {0.5, 1.5, 3.3, -1.7};
-	float init_result_mult[] = {0.15, 0.0, -0.61, 1.4};
+	float init_result_mult[] = {1.5, 0.05, -2.7, 0.05};
 
 	RobotDevMath::MatrixR m1(2, 2, init_1);
 	RobotDevMath::MatrixR m2(2, 2, init_2);
@@ -100,13 +107,13 @@ TEST(MatrixR, FirstTest)
 
 	// positive and negative test for matrix vector multiplication
 	float init_vector[] = {0.2, 0.8};
-	float init_vector_result[] = {0.6, 0.64};
+	float init_vector_result[] = {1.8, 0.34};
 	float init_vector_notresult[] = {0.6, 0.63};
-	RobotDevMath::MatrixR v1(1, 2, init_vector);
+	RobotDevMath::MatrixR v1(2, 1, init_vector);
 	RobotDevMath::MatrixR mv = m1 * v1;
 
-	CHECK(mv == RobotDevMath::MatrixR(1, 2, init_vector_result));
-	CHECK_FALSE(mv == RobotDevMath::MatrixR(1, 2, init_vector_notresult));
+	CHECK(mv == RobotDevMath::MatrixR(2, 1, init_vector_result));
+	CHECK_FALSE(mv == RobotDevMath::MatrixR(2, 1, init_vector_notresult));
 
 	// translation and rotation of 2D vector in homogeneous coodinates
 	// result calculated with Matlab
@@ -115,24 +122,37 @@ TEST(MatrixR, FirstTest)
 	float theta = M_PI / 4;
 	float result[] = {2.3213, 5.7497, 1.0};
 
-	float transformation[] = {cos(theta), -sin(theta), translation[0],
-			                 sin(theta), cos(theta), translation[1],
-							 0, 0, 1};
+	float transformation[] = {cos(theta), sin(theta), 0,
+			-sin(theta), cos(theta), 0,
+			translation[0], translation[1], 1};
 	RobotDevMath::MatrixR trans_m(3, 3, transformation);
-	RobotDevMath::MatrixR vec_p(1, 3, point);
+	RobotDevMath::MatrixR vec_p(3, 1, point);
 	RobotDevMath::MatrixR vec_n = trans_m * vec_p;
-	RobotDevMath::MatrixR vec_r(1, 3, result);
+	RobotDevMath::MatrixR vec_r(3, 1, result);
 
 	CHECK(vec_n == vec_r);
 
-	}
+}
 
-	RobotTest::RobotTest() {
 
-	}
 
-	RobotTest::~RobotTest() {
-	}
+TEST_GROUP(DistanceSensor)
+{
+
+};
+
+TEST(DistanceSensor, FirstTest)
+{
+	RobotDev::DistanceSensor(0, &leftFrontSensorM);
+
+}
+
+RobotTest::RobotTest() {
+
+}
+
+RobotTest::~RobotTest() {
+}
 
 
 } /* namespace RobotDevUnitTest */
