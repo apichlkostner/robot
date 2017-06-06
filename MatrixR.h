@@ -23,8 +23,8 @@ class MatrixR {
 public:
 
 	MatrixR() = default;
-	//MatrixR(MatrixR &&);
-	MatrixR(int, int, float *);
+	MatrixR(int, int, const float *);
+	//MatrixR(int, int, const float *);
 	MatrixR(int, int);
 	bool operator==(const MatrixR& m);
 	MatrixR& operator=(MatrixR&&) = default;
@@ -36,7 +36,7 @@ public:
 	const MatrixR operator+(const MatrixR& m);
 	MatrixR& operator-=(const MatrixR& m);
 	const MatrixR operator-(const MatrixR& m);
-	const MatrixR operator*(const MatrixR& m);
+	const MatrixR operator*(const MatrixR& m) const;
 
 	const float operator()(int col, int row) const;
 
