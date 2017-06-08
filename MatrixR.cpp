@@ -21,6 +21,12 @@
 
 namespace RobotDevMath {
 
+MatrixR::MatrixR()
+{
+	elems = 0;
+	num_rows = num_cols = 0;
+}
+
 MatrixR::MatrixR(int num_rows, int num_cols, const float *in) : num_rows(num_rows), num_cols(num_cols)
 {
 	int size = num_rows * num_cols;
@@ -44,10 +50,34 @@ MatrixR::MatrixR(int num_rows, int num_cols) : num_rows(num_rows), num_cols(num_
 	elems = new float[size];
 }
 
+MatrixR& MatrixR::operator=(MatrixR&& m)
+{
+	if (elems)
+		delete[] elems;
+	num_cols = m.num_cols;
+	num_rows = m.num_rows;
+	elems = m.elems;
 
-MatrixR::MatrixR(const MatrixR& m) : num_rows(m.num_rows), num_cols(m.num_cols)
+	m.num_cols = 0;
+	m.num_rows = 0;
+	m.elems = 0;
+
+	return *this;
+}
+
+MatrixR::MatrixR(MatrixR&& m) : num_rows(m.num_rows), num_cols(m.num_cols), elems(0)
+{
+	elems = m.elems;
+
+	m.num_cols = 0;
+	m.num_rows = 0;
+	m.elems = 0;
+}
+
+MatrixR::MatrixR(MatrixR const & m) : num_rows(m.num_rows), num_cols(m.num_cols)
 {
 	int size = num_rows * num_cols;
+
 	elems = new float[size];
 	for (auto p = 0; p < size; p++) {
 		elems[p] = m.elems[p];
@@ -56,8 +86,10 @@ MatrixR::MatrixR(const MatrixR& m) : num_rows(m.num_rows), num_cols(m.num_cols)
 
 MatrixR::~MatrixR()
 {
-	if (elems)
+	if (elems != 0) {
 		delete[] elems;
+		elems = 0;
+	}
 }
 
 const float MatrixR::operator()(int row, int col) const
@@ -66,7 +98,7 @@ const float MatrixR::operator()(int row, int col) const
 }
 
 bool MatrixR::operator==(const MatrixR& m)
-								{
+										{
 	if (num_rows != m.num_rows || num_cols != m.num_cols)
 		return false;
 
@@ -77,10 +109,10 @@ bool MatrixR::operator==(const MatrixR& m)
 
 	}
 	return true;
-								}
+										}
 
 MatrixR& MatrixR::operator+=(const MatrixR& m)
-								{
+										{
 	if ((m.num_rows == num_rows) && (m.num_cols == num_cols)) {
 		int size = num_rows * num_cols;
 		for (auto p = 0; p < size; p++) {
@@ -88,10 +120,10 @@ MatrixR& MatrixR::operator+=(const MatrixR& m)
 		}
 	}
 	return *this;
-								}
+										}
 
 MatrixR& MatrixR::operator-=(const MatrixR& m)
-								{
+										{
 	if ((m.num_rows == num_rows) && (m.num_cols == num_cols)) {
 		int size = num_rows * num_cols;
 		for (auto p = 0; p < size; p++) {
@@ -99,7 +131,7 @@ MatrixR& MatrixR::operator-=(const MatrixR& m)
 		}
 	}
 	return *this;
-								}
+										}
 
 const MatrixR MatrixR::operator*(const MatrixR& m) const
 {
@@ -135,5 +167,18 @@ const MatrixR MatrixR::operator-(const MatrixR& m)
 	return MatrixR(*this) -= m;
 }
 
+float MatrixR::norm2()
+{
+	float norm = 0;
+
+	for (int r = 0; r < num_rows; r++) {
+		for (int c = 0; c < num_cols; c++) {
+			float val = (*this)(r, c);
+			norm += val * val;
+		}
+	}
+
+	return norm;
+}
 
 } /* namespace RobotDevMath */
