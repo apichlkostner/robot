@@ -26,8 +26,6 @@ Robot::Robot() {
 	accel.enableBump();
 	accel.setBumpThresh(bumpThreshold);
 #endif
-	//d_sensors[0] = DistanceSensor(A3, leftSensorM);
-	//d_sensors = {DistanceSensor(A3, leftSensorM), DistanceSensor(A1, leftSensorM), DistanceSensor(A0, leftSensorM), DistanceSensor(A6, leftSensorM),DistanceSensor(A7, leftSensorM)}
 }
 
 Robot::~Robot() {
@@ -47,6 +45,11 @@ void Robot::sense(float dt)
 
 	v_l = delta_l / dt / countsPerRev * (2.0 * M_PI);
 	v_r = delta_r / dt / countsPerRev * (2.0 * M_PI);
+
+	for (int s = 0; s < numDistanceSensors; s++) {
+		obstacle[s].dist = d_sensors[s].measure();
+		obstacle[s].pos  = d_sensors[s].getPosInRobotCoord();
+	}
 }
 
 
@@ -180,19 +183,21 @@ void Robot::stop()
 void Robot::printDebug()
 {
 #if 1
-	for (int i=0; i<5; i++) {
-		Serial.println(i);
-		MatrixR pos = d_sensors[i].getPosInRobotCoord();
+		for (int i=0; i<5; i++) {
+			Serial.println(i);
+			//MatrixR pos = d_sensors[i].getPosInRobotCoord();
 
-		//Serial.print(d_sensors[i].getDistance());
-		Serial.print(pos(0,0));
-		Serial.print("\t");
-		Serial.print(pos(1,0));
-		Serial.print("\t");
-		Serial.print(pos(2,0));
-		Serial.println("");
-	}
-	Serial.println("---------------");
+			//Serial.print(d_sensors[i].getDistance());
+			Serial.print(obstacle[i].pos(0,0));
+			Serial.print("\t");
+			Serial.print(obstacle[i].pos(1,0));
+			Serial.print("\t");
+			Serial.print(obstacle[i].pos(2,0));
+			Serial.print("\t");
+			Serial.print(obstacle[i].dist);
+			Serial.println("");
+		}
+		Serial.println("---------------");
 #else
 	Serial.print(pos.x);
 	Serial.print("\t");

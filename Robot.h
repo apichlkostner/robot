@@ -46,6 +46,11 @@ struct vectors {
 	int size;
 };
 
+struct obstacle {
+	float dist;
+	MatrixR pos;
+};
+
 
 class Robot {
 private:
@@ -68,11 +73,14 @@ private:
 	RobotSound sound;
 	Motor motor;
 
-	DistanceSensor d_sensors[5] = {DistanceSensor(A3, &leftSensorM),
+	static const int numDistanceSensors = 5;
+	DistanceSensor d_sensors[numDistanceSensors] = {DistanceSensor(A3, &leftSensorM),
 			DistanceSensor(A1, &leftFrontSensorM),
 			DistanceSensor(A0, &frontSensorM),
 			DistanceSensor(A6, &rightFrontSensorM),
 			DistanceSensor(A7, &rightSensorM)};
+
+	struct obstacle obstacle[numDistanceSensors];
 
 	RedBotEncoder encoder = RedBotEncoder(A2, 10);
 

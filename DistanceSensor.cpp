@@ -32,43 +32,24 @@ DistanceSensor::~DistanceSensor() {
 	// TODO Auto-generated destructor stub
 }
 
-float DistanceSensor::getDistance() {
+float DistanceSensor::measure() {
 	int sensor_adc = analogRead(pin);
 	float sensor_volt = sensor_adc * 5.0 / 1024;
 
-	return curve.getVal(sensor_volt);
+	distance = curve.getVal(sensor_volt);
+
+	return distance;
+}
+
+
+float DistanceSensor::getDistance() {
+	return distance;
 }
 
 MatrixR DistanceSensor::getPosInRobotCoord()
 {
-	float dist = getDistance();
-	float dist_vec[] = {dist, 0, 1};
+	float dist_vec[] = {distance, 0, 1};
 	MatrixR posInSensor = MatrixR(3, 1, dist_vec);
-
-//	Serial.print(posInSensor(0,0));
-//		Serial.print("\t");
-//		Serial.print(posInSensor(0,1));
-//		Serial.print("\t");
-//		Serial.println(posInSensor(0,2));
-//
-//	Serial.print((*SensorToRobot)(0,0));
-//	Serial.print("\t");
-//	Serial.print((*SensorToRobot)(0,1));
-//	Serial.print("\t");
-//	Serial.print((*SensorToRobot)(0,2));
-//	Serial.print("\t");
-//	Serial.print((*SensorToRobot)(1,0));
-//	Serial.print("\t");
-//	Serial.print((*SensorToRobot)(1,1));
-//	Serial.print("\t");
-//	Serial.print((*SensorToRobot)(1,2));
-//	Serial.print("\t");
-//	Serial.print((*SensorToRobot)(2,0));
-//	Serial.print("\t");
-//	Serial.print((*SensorToRobot)(2,1));
-//	Serial.print("\t");
-//	Serial.println((*SensorToRobot)(2,2));
-//	Serial.println("->");
 
 	return (*SensorToRobot) * posInSensor;
 }

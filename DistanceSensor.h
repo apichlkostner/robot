@@ -34,6 +34,8 @@ protected:
 	const float dist[LEN_CURVE] = {0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.05};
 	const MatrixR *SensorToRobot;
 
+	float distance;
+
 	Curve curve;
 
 public:
@@ -43,6 +45,7 @@ public:
 
 	virtual ~DistanceSensor();
 
+	float measure();
 	float getDistance();
 	MatrixR getPosInRobotCoord();
 };
