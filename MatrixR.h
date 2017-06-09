@@ -38,6 +38,7 @@ public:
 	const MatrixR operator*(const MatrixR& m) const;
 
 	MatrixR& operator=(MatrixR&& m);
+	MatrixR& operator=(const MatrixR& m);
 
 	const float operator()(int col, int row) const;
 

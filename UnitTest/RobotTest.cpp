@@ -25,7 +25,7 @@
 
 int analogRead(int r)
 {
-	return 500;
+	return (r + 1) * 200;
 }
 
 namespace RobotDevUnitTest {
@@ -84,7 +84,18 @@ TEST(MatrixR, FirstTest)
 	DOUBLES_EQUAL(1.3, m2(0,1), 0.000001);
 	DOUBLES_EQUAL(-2.0, m2(1,1), 0.000001);
 
-	// check of equality operator
+	// copy contructor
+	MatrixR m2_cpy2(m2);
+	CHECK(m2 == m2_cpy2);
+
+	// = operator
+	m2_cpy2 = m1;
+	CHECK(m1 == m2_cpy2);
+
+	m2_cpy2 = m2;
+	CHECK_FALSE(m1 == m2_cpy2);
+
+	// check of equality operator ==
 	CHECK(m2 == m2_cpy);
 	CHECK_FALSE(m2 == m1);
 
@@ -118,19 +129,25 @@ TEST(MatrixR, FirstTest)
 	// translation and rotation of 2D vector in homogeneous coodinates
 	// result calculated with Matlab
 	float point[] = {5.0, 2.0, 1};  // homogeneous coordinate
+	float point2[] = {7.0, 3.0, 1};
 	float translation[2] = {0.2, 0.8};
 	float theta = M_PI / 4;
 	float result[] = {2.3213, 5.7497, 1.0};
+	float result2[] = {3.0284, 7.8711, 1.0};
 
 	float transformation[] = {cos(theta), sin(theta), 0,
 			-sin(theta), cos(theta), 0,
 			translation[0], translation[1], 1};
 	RobotDevMath::MatrixR trans_m(3, 3, transformation);
 	RobotDevMath::MatrixR vec_p(3, 1, point);
+	RobotDevMath::MatrixR vec_p2(3, 1, point2);
 	RobotDevMath::MatrixR vec_n = trans_m * vec_p;
+	RobotDevMath::MatrixR vec_n2 = trans_m * vec_p2;
 	RobotDevMath::MatrixR vec_r(3, 1, result);
+	RobotDevMath::MatrixR vec_r2(3, 1, result2);
 
 	CHECK(vec_n == vec_r);
+	CHECK(vec_n2 == vec_r2);
 
 }
 
@@ -143,8 +160,37 @@ TEST_GROUP(DistanceSensor)
 
 TEST(DistanceSensor, FirstTest)
 {
-	RobotDev::DistanceSensor(0, &leftFrontSensorM);
+	RobotDev::DistanceSensor ds0(0, &leftFrontSensorM);
+	RobotDev::DistanceSensor ds1(1, &leftSensorM);
 
+	ds0.measure();
+	ds1.measure();
+
+	DOUBLES_EQUAL(0.28, ds0.getDistance(), 0.01);
+	DOUBLES_EQUAL(0.10, ds1.getDistance(), 0.01);
+
+
+	// this also checks copy constructor of MatrixR
+	MatrixR v0 = ds0.getPosInRobotCoord();
+	MatrixR v1 = ds1.getPosInRobotCoord();
+
+	// this also checks move operator  of MatrixR
+    MatrixR v[2];
+	v[0] = ds0.getPosInRobotCoord();
+	v[1] = ds1.getPosInRobotCoord();
+
+	CHECK(v0 == v[0]);
+	CHECK(v1 == v[1]);
+	CHECK_FALSE(v[0] == v[1]);
+	CHECK_FALSE(v0 == v[1]);
+
+	DOUBLES_EQUAL(v[0](0, 0), 0.313231, 0.000001);
+	DOUBLES_EQUAL(v[0](1, 0), 0.190430, 0.000001);
+	DOUBLES_EQUAL(v[0](2, 0), 1.0, 0.000001);
+
+	DOUBLES_EQUAL(v[1](0, 0), -0.075, 0.000001);
+	DOUBLES_EQUAL(v[1](1, 0), 0.182031, 0.000001);
+	DOUBLES_EQUAL(v[1](2, 0), 1.0, 0.000001);
 }
 
 RobotTest::RobotTest() {

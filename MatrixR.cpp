@@ -65,6 +65,25 @@ MatrixR& MatrixR::operator=(MatrixR&& m)
 	return *this;
 }
 
+MatrixR& MatrixR::operator=(const MatrixR& m)
+{
+	if (elems)
+		delete[] elems;
+
+	num_cols = m.num_cols;
+	num_rows = m.num_rows;
+
+	int size = num_rows * num_cols;
+
+	elems = new float[size];
+
+	for (auto p = 0; p < size; p++) {
+		elems[p] = m.elems[p];
+	}
+
+	return *this;
+}
+
 MatrixR::MatrixR(MatrixR&& m) : num_rows(m.num_rows), num_cols(m.num_cols), elems(0)
 {
 	elems = m.elems;
@@ -98,7 +117,7 @@ const float MatrixR::operator()(int row, int col) const
 }
 
 bool MatrixR::operator==(const MatrixR& m)
-										{
+												{
 	if (num_rows != m.num_rows || num_cols != m.num_cols)
 		return false;
 
@@ -109,10 +128,10 @@ bool MatrixR::operator==(const MatrixR& m)
 
 	}
 	return true;
-										}
+												}
 
 MatrixR& MatrixR::operator+=(const MatrixR& m)
-										{
+												{
 	if ((m.num_rows == num_rows) && (m.num_cols == num_cols)) {
 		int size = num_rows * num_cols;
 		for (auto p = 0; p < size; p++) {
@@ -120,10 +139,10 @@ MatrixR& MatrixR::operator+=(const MatrixR& m)
 		}
 	}
 	return *this;
-										}
+												}
 
 MatrixR& MatrixR::operator-=(const MatrixR& m)
-										{
+												{
 	if ((m.num_rows == num_rows) && (m.num_cols == num_cols)) {
 		int size = num_rows * num_cols;
 		for (auto p = 0; p < size; p++) {
@@ -131,7 +150,7 @@ MatrixR& MatrixR::operator-=(const MatrixR& m)
 		}
 	}
 	return *this;
-										}
+												}
 
 const MatrixR MatrixR::operator*(const MatrixR& m) const
 {
