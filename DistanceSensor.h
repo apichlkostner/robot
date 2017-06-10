@@ -39,7 +39,7 @@ protected:
 	Curve curve;
 
 public:
-	DistanceSensor();
+	//DistanceSensor();
 	DistanceSensor(uint8_t pin);
 	DistanceSensor(uint8_t pin, const MatrixR*);
 

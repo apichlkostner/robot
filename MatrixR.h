@@ -36,11 +36,13 @@ public:
 	MatrixR& operator-=(const MatrixR& m);
 	const MatrixR operator-(const MatrixR& m);
 	const MatrixR operator*(const MatrixR& m) const;
+	const MatrixR operator*(float m) const;
 
 	MatrixR& operator=(MatrixR&& m);
 	MatrixR& operator=(const MatrixR& m);
 
 	const float operator()(int col, int row) const;
+	float& operator()(int row, int col);
 
 	float norm2();
 

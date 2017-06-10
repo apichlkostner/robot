@@ -4,7 +4,7 @@
 const float lsTheta = M_PI / 2.0;
 const float lsMatrix[] = {cos(lsTheta), sin(lsTheta),  0,
 		                  -sin(lsTheta), cos(lsTheta),   0,
-						  -0.075,            0.08,              1.0};
+						  -ROBOT_REAR_SENSOR_X,            ROBOT_REAR_SENSOR_Y,              1.0};
 
 const float lfsTheta = M_PI / 6.0;
 const float lfsMatrix[] = {cos(lfsTheta), sin(lfsTheta), 0,
@@ -19,7 +19,7 @@ const float fsMatrix[] = {cos(fsTheta), sin(fsTheta), 0,
 const float rsTheta = -M_PI / 2.0;
 const float rsMatrix[] = {cos(rsTheta), sin(rsTheta),  0,
 		                  -sin(rsTheta), cos(rsTheta),   0,
-						  -0.075,            -0.08,              1.0};
+						  -ROBOT_REAR_SENSOR_X,            -ROBOT_REAR_SENSOR_Y,              1.0};
 
 const float rfsTheta = -M_PI / 6.0;
 const float rfsMatrix[] = {cos(rfsTheta), sin(rfsTheta), 0,

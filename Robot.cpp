@@ -20,7 +20,9 @@
 namespace RobotDev {
 
 Robot::Robot() {
-	v_s = 0.02;
+	float init_pos[] = {0, 0, 1};
+	pos = MatrixR(3, 1, init_pos);
+	v_s = 0.01;
 	started = false;
 #if ROBOTDEV_ACCELEROMETER_INSTALLED
 	accel.enableBump();
@@ -46,9 +48,15 @@ void Robot::sense(float dt)
 	v_l = delta_l / dt / countsPerRev * (2.0 * M_PI);
 	v_r = delta_r / dt / countsPerRev * (2.0 * M_PI);
 
+
+	float fsMatrix[] = {cos(theta), sin(theta), 0,
+			-sin(theta), cos(theta),   0.0,
+			pos(0, 0),            pos(1, 0),              1.0};
+	MatrixR M_R2W(3, 3, fsMatrix);
 	for (int s = 0; s < numDistanceSensors; s++) {
 		obstacle[s].dist = d_sensors[s].measure();
-		obstacle[s].pos  = d_sensors[s].getPosInRobotCoord();
+		MatrixR pos = d_sensors[s].getPosInRobotCoord();
+		obstacle[s].pos  = M_R2W * pos;
 	}
 }
 
@@ -62,18 +70,56 @@ void Robot::updateState(float dt)
 	theta += omega * dt;
 	theta = atan2(sin(theta), cos(theta));
 
-	pos.x += v_x * dt;
-	pos.y += v_y * dt;
+	pos(0, 0) += v_x * dt;
+	pos(1, 0) += v_y * dt;
 }
+
+#define CONTROLTYPE_GOTOGOAL      0
+#define CONTROLTYPE_AVOIDOBSTACLE 1
+#define CONTROLTYPE CONTROLTYPE_AVOIDOBSTACLE
 
 void Robot::control(float dt)
 {
 	if (started) {
+#if CONTROLTYPE == CONTROLTYPE_GOTOGOAL
 		// vector from robot to goal
 		vector u_gtg = {
-				route.v[route.i].x - pos.x,
-				route.v[route.i].y - pos.y
+				route.v[route.i].x - pos(0, 0),
+				route.v[route.i].y - pos(1, 0)
 		};
+#else
+		MatrixR gtg(3, 1);
+		float mposa[] = {pos(0, 0), pos(1, 0), 0};
+		MatrixR mpos(3, 1, mposa);
+		float weight[] = {2, 4, 3, 4, 2};
+
+		for (int s = 0; s < numDistanceSensors; s++) {
+
+			gtg += (obstacle[s].pos - mpos) * weight[s];
+			Serial.print(obstacle[s].pos(0,0));
+			Serial.print("\t");
+			Serial.print(obstacle[s].pos(1,0));
+			Serial.print("\t");
+
+		}
+		Serial.println("\t");
+
+		vector u_gtg = {gtg(0,0), gtg(1,0)};
+		Serial.print(u_gtg.x);
+		Serial.print("\t");
+		Serial.print(u_gtg.y);
+		Serial.print("\t");
+		Serial.print(pos(0, 0));
+		Serial.print("\t");
+		Serial.print(pos(1, 0));
+		Serial.print("\t");
+		Serial.print(gtg(0,0));
+		Serial.print("\t");
+		Serial.print(gtg(1,0));
+		Serial.println("");
+		Serial.println("---------------------------");
+
+#endif
 
 		// delta angle between robot heading and vector to goal
 		float theta_gtg = atan2(u_gtg.y, u_gtg.x);
@@ -86,6 +132,7 @@ void Robot::control(float dt)
 		// angle speed from PID controller
 		w = cntrl.calc(e_k, dt);
 
+#if CONTROLTYPE == CONTROLTYPE_GOTOGOAL
 		// speed for right and left wheel to set angle speed from controller
 		if (u_gtg.x*u_gtg.x + u_gtg.y*u_gtg.y > stopDistanceSquared) {
 			v_r_s = (2*v_s + w*L) / (2*R);
@@ -96,6 +143,10 @@ void Robot::control(float dt)
 				stop();
 			}
 		}
+#else
+		v_r_s = (2*v_s + w*L) / (2*R);
+		v_l_s = (2*v_s - w*L) / (2*R);
+#endif
 	}
 }
 
@@ -144,9 +195,8 @@ void Robot::checkState(float dt)
 		}
 #endif
 
-		float front_distance = d_sensors[2].getDistance();
-
-		if (front_distance < 0.1) {
+		// distance sensor
+		if (obstacle[2].dist < 0.02) {
 			sound.start(1000, 1);
 			stop();
 		}
@@ -183,11 +233,14 @@ void Robot::stop()
 void Robot::printDebug()
 {
 #if 1
-		for (int i=0; i<5; i++) {
-			Serial.println(i);
-			//MatrixR pos = d_sensors[i].getPosInRobotCoord();
+		Serial.print(pos(0, 0));
+		Serial.print("\t");
+		Serial.print(pos(1, 0));
+		Serial.print("\t");
+		Serial.print(theta);
+		Serial.println("\t");
 
-			//Serial.print(d_sensors[i].getDistance());
+		for (int i=0; i<5; i++) {
 			Serial.print(obstacle[i].pos(0,0));
 			Serial.print("\t");
 			Serial.print(obstacle[i].pos(1,0));
@@ -199,9 +252,9 @@ void Robot::printDebug()
 		}
 		Serial.println("---------------");
 #else
-	Serial.print(pos.x);
+	Serial.print(pos(0, 0));
 	Serial.print("\t");
-	Serial.print(pos.y);
+	Serial.print(pos(1, 0));
 	Serial.print("\t");
 	Serial.println(theta);
 

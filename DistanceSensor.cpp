@@ -18,9 +18,9 @@
 
 namespace RobotDev {
 
-DistanceSensor::DistanceSensor() {
-	DistanceSensor(A0);
-}
+//DistanceSensor::DistanceSensor() {
+//	DistanceSensor(A0);
+//}
 
 DistanceSensor::DistanceSensor(uint8_t pin, const MatrixR *MPos) {
 	curve = Curve(volt, dist, LEN_CURVE);

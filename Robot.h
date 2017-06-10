@@ -66,7 +66,7 @@ private:
 	float v_l;
 	float v_r;
 
-	vector pos;
+	MatrixR pos;
 	float theta;
 
 	PIDController cntrl;

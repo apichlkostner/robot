@@ -18,21 +18,28 @@
 #include "CppUTest/CommandLineTestRunner.h"
 #include <math.h>
 
-#include "../RobotConfig.h"
-#include "../Curve.h"
-#include "../MatrixR.h"
-#include "../DistanceSensor.h"
+#define private public
 
+#include "RobotConfig.h"
+#include "Curve.h"
+#include "MatrixR.h"
+#include "DistanceSensor.h"
+#include "Robot.h"
+
+volatile int analogReadMode;
 int analogRead(int r)
 {
-	return (r + 1) * 200;
+	if (analogReadMode == 0)
+		return (r + 1) * 200;
+	else
+		return 70;
 }
 
 namespace RobotDevUnitTest {
 
 TEST_GROUP(Curve)
-				{
-				};
+								{
+								};
 
 TEST(Curve, FirstTest)
 {
@@ -160,6 +167,8 @@ TEST_GROUP(DistanceSensor)
 
 TEST(DistanceSensor, FirstTest)
 {
+	analogReadMode = 0;
+
 	RobotDev::DistanceSensor ds0(0, &leftFrontSensorM);
 	RobotDev::DistanceSensor ds1(1, &leftSensorM);
 
@@ -170,12 +179,13 @@ TEST(DistanceSensor, FirstTest)
 	DOUBLES_EQUAL(0.10, ds1.getDistance(), 0.01);
 
 
+
 	// this also checks copy constructor of MatrixR
 	MatrixR v0 = ds0.getPosInRobotCoord();
 	MatrixR v1 = ds1.getPosInRobotCoord();
 
 	// this also checks move operator  of MatrixR
-    MatrixR v[2];
+	MatrixR v[2];
 	v[0] = ds0.getPosInRobotCoord();
 	v[1] = ds1.getPosInRobotCoord();
 
@@ -192,6 +202,46 @@ TEST(DistanceSensor, FirstTest)
 	DOUBLES_EQUAL(v[1](1, 0), 0.182031, 0.000001);
 	DOUBLES_EQUAL(v[1](2, 0), 1.0, 0.000001);
 }
+
+TEST_GROUP(Robot)
+{
+
+};
+
+
+TEST(Robot, Sense)
+{
+	analogReadMode = 1;
+	RobotDev::Robot robot;
+	robot.sense(0.001);
+
+	DOUBLES_EQUAL(0.8, robot.obstacle[0].dist, 0.001);
+	DOUBLES_EQUAL(-ROBOT_REAR_SENSOR_X, robot.obstacle[0].pos(0,0), 0.001);
+	DOUBLES_EQUAL(0.8+ROBOT_REAR_SENSOR_Y, robot.obstacle[0].pos(1,0), 0.001);
+
+	robot.pos(0, 0) = 5.45;
+	robot.pos(1, 0) = -3.23;
+
+	robot.sense(0.001);
+
+	DOUBLES_EQUAL(0.8, robot.obstacle[0].dist, 0.001);
+	DOUBLES_EQUAL(-ROBOT_REAR_SENSOR_X+robot.pos(0, 0), robot.obstacle[0].pos(0,0), 0.001);
+	DOUBLES_EQUAL(0.8+ROBOT_REAR_SENSOR_Y+robot.pos(1, 0), robot.obstacle[0].pos(1,0), 0.001);
+
+	robot.theta = M_PI / 3;
+	robot.sense(0.001);
+
+	DOUBLES_EQUAL(-ROBOT_REAR_SENSOR_X, robot.d_sensors[0].getPosInRobotCoord()(0,0), 0.001);
+	DOUBLES_EQUAL(ROBOT_REAR_SENSOR_Y + 0.8, robot.d_sensors[0].getPosInRobotCoord()(1,0), 0.001);
+	DOUBLES_EQUAL(0.8, robot.obstacle[0].dist, 0.001);
+	DOUBLES_EQUAL(sin(robot.theta) * (-(ROBOT_REAR_SENSOR_Y+0.8)) - cos(robot.theta)*ROBOT_REAR_SENSOR_X+ robot.pos(0, 0),
+			robot.obstacle[0].pos(0,0), 0.0001);
+	DOUBLES_EQUAL(cos(robot.theta) * (ROBOT_REAR_SENSOR_Y+0.8) - sin(robot.theta)*ROBOT_REAR_SENSOR_X + robot.pos(1, 0),
+			robot.obstacle[0].pos(1,0), 0.0001);
+
+}
+
+
 
 RobotTest::RobotTest() {
 
