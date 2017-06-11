@@ -65,6 +65,7 @@ private:
 
 	float v_l;
 	float v_r;
+	float v;
 
 	MatrixR pos;
 	float theta;
@@ -81,6 +82,7 @@ private:
 			DistanceSensor(A7, &rightSensorM)};
 
 	struct obstacle obstacle[numDistanceSensors];
+	float dist_near_obst;
 
 	RedBotEncoder encoder = RedBotEncoder(A2, 10);
 
@@ -99,6 +101,7 @@ private:
 	float v_x;
 	float v_y;
 	float omega;
+	float dist_goal;
 
 	boolean started;
 
