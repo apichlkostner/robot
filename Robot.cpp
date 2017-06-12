@@ -84,8 +84,9 @@ void Robot::updateState(float dt)
 #define CONTROLTYPE_GOTOGOAL         0
 #define CONTROLTYPE_AVOIDOBSTACLE    1
 #define CONTROLTYPE_BLENDING         2
+#define CONTROLTYPE_SWITCHING        3
 
-#define CONTROLTYPE                  CONTROLTYPE_AVOIDOBSTACLE
+#define CONTROLTYPE                  CONTROLTYPE_SWITCHING
 
 void Robot::control(float dt)
 {
@@ -105,28 +106,28 @@ void Robot::control(float dt)
 		for (int s = 0; s < numDistanceSensors; s++) {
 
 			gtg += (obstacle[s].pos - mpos) * weight[s];
-			//			Serial.print(obstacle[s].pos(0,0));
-			//			Serial.print("\t");
-			//			Serial.print(obstacle[s].pos(1,0));
-			//			Serial.print("\t");
+			Serial.print(obstacle[s].dist);
+			Serial.print(" = \t(");
+			Serial.print(obstacle[s].pos(0,0));
+			Serial.print("\t");
+			Serial.print(obstacle[s].pos(1,0));
+			Serial.print(")\t");
 
 		}
-		//		Serial.println("\t");
-		//
-		//		Serial.print(u_gtg.x);
-		//		Serial.print("\t");
-		//		Serial.print(u_gtg.y);
-		//		Serial.print("\t");
-		//		Serial.print(pos(0, 0));
-		//		Serial.print("\t");
-		//		Serial.print(pos(1, 0));
-		//		Serial.print("\t");
-		//		Serial.print(gtg(0,0));
-		//		Serial.print("\t");
-		//		Serial.print(gtg(1,0));
-		//		Serial.println("");
-		//		Serial.println("---------------------------");
-#else
+		Serial.println("");
+		Serial.print("\tpos =\t");
+		Serial.print(pos(0, 0));
+		Serial.print("\t");
+		Serial.print(pos(1, 0));
+		Serial.print("\t");
+		Serial.print(theta);
+		Serial.print("\t gtg =\t");
+		Serial.print(gtg(0,0));
+		Serial.print("\t");
+		Serial.print(gtg(1,0));
+		Serial.println("");
+		Serial.println("---------------------------");
+#elif CONTROL_TYPE == CONTROLTYPE_BLENDING
 		MatrixR gtg(3, 1);
 		float mposa[] = {pos(0, 0), pos(1, 0), 0};
 		MatrixR mpos(3, 1, mposa);
@@ -168,6 +169,58 @@ void Robot::control(float dt)
 		Serial.println("\t");
 
 		gtg += gtg_v * dist_front_obst;
+#else
+		static int mode = 0;
+
+		MatrixR gtg(3, 1);
+
+		float min_obstacle_dist = 0.8;
+		float dist_front_obst = (obstacle[1].dist + obstacle[2].dist + obstacle[3].dist) / 3;
+		for (int p = 1; p <=3; p++)
+			if (obstacle[p].dist < min_obstacle_dist)
+				min_obstacle_dist = obstacle[p].dist;
+
+		if (min_obstacle_dist > 0.3) {
+			if (mode == 1)
+				sound.start(3000, 1);
+			mode = 0;
+		}
+		if (min_obstacle_dist < 0.1) {
+			if (mode == 0)
+				sound.start(500, 1);
+			mode = 1;
+		}
+
+		if (mode == 0) {
+			float gtg_a[] = {
+					route.v[route.i].x - pos(0, 0),
+					route.v[route.i].y - pos(1, 0)
+			};
+
+			gtg = MatrixR(3, 1, gtg_a);
+			dist_goal = gtg.norm2();
+		} else {
+			float mposa[] = {pos(0, 0), pos(1, 0), 1};
+			MatrixR mpos(3, 1, mposa);
+			float weight[] = {2, 4, 3, 4, 2};
+
+			for (int s = 0; s < numDistanceSensors; s++) {
+				MatrixR obs_v = obstacle[s].pos - mpos;
+				gtg += obs_v * weight[s];
+			}
+
+		}
+		Serial.print(dist_goal);
+		Serial.print("\t");
+		Serial.print(dist_front_obst);
+		Serial.print("\t");
+		Serial.print(min_obstacle_dist);
+		Serial.print("\t");
+		Serial.print(gtg(0,0));
+		Serial.print("\t");
+		Serial.print(gtg(1,0));
+		Serial.print("\t");
+		Serial.println("\t");
 #endif
 
 		// delta angle between robot heading and vector to goal

@@ -13,7 +13,7 @@ int buttonPin = 12;
 static int doPrint;
 
 struct vector waypoints[] = {
-		{1.0, 0.0},
+		{1.5, 0.0},
 		{0.0, 0.0},
 };
 

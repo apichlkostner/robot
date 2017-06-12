@@ -70,7 +70,7 @@ private:
 	MatrixR pos;
 	float theta;
 
-	PIDController cntrl;
+	PIDController cntrl;// = PIDController(0.2, 0.05, 0.05);
 	RobotSound sound;
 	Motor motor;
 
