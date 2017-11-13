@@ -133,6 +133,17 @@ TEST(MatrixR, FirstTest)
 	CHECK(mv == RobotDevMath::MatrixR(2, 1, init_vector_result));
 	CHECK_FALSE(mv == RobotDevMath::MatrixR(2, 1, init_vector_notresult));
 
+	// multiplication with scalar
+	const float floating_val = 2.1;
+	float init_d[] = {floating_val*1, floating_val*0.5, floating_val*2, floating_val*0.3};
+	RobotDevMath::MatrixR mf_multresult(2, 2, init_d);
+
+	RobotDevMath::MatrixR mf_rightmul = floating_val * m1;
+	RobotDevMath::MatrixR mf_leftmul = m1 * floating_val;
+
+	CHECK(mf_rightmul == mf_leftmul);
+	CHECK(mf_rightmul == mf_multresult);
+
 	// translation and rotation of 2D vector in homogeneous coodinates
 	// result calculated with Matlab
 	float point[] = {5.0, 2.0, 1};  // homogeneous coordinate

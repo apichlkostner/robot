@@ -36,7 +36,8 @@ public:
 	MatrixR& operator-=(const MatrixR& m);
 	const MatrixR operator-(const MatrixR& m);
 	const MatrixR operator*(const MatrixR& m) const;
-	const MatrixR operator*(float m) const;
+	friend MatrixR operator*(const float f, const MatrixR& m);
+	const MatrixR operator*(float f) const;
 
 	MatrixR& operator=(MatrixR&& m);
 	MatrixR& operator=(const MatrixR& m);

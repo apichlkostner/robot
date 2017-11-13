@@ -183,6 +183,18 @@ const MatrixR MatrixR::operator*(const MatrixR& m) const
 	return MatrixR();
 }
 
+MatrixR operator*(const float f, const MatrixR& m)
+{
+	MatrixR mr(m.num_rows, m.num_cols);
+	int size = m.num_rows * m.num_cols;
+
+	for (auto p = 0; p < size; p++) {
+		mr.elems[p] = f * m.elems[p];
+	}
+
+	return mr;
+}
+
 const MatrixR MatrixR::operator*(float f) const
 {
 	MatrixR mr(num_rows, num_cols);
