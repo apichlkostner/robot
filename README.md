@@ -9,7 +9,7 @@ make upload
 ```
 builds the project and uploads to the Arduino.
 
-Unit tests can be done on the PC in folder UnitTest.
+Unit tests can be done on the PC in folder UnitTest. It uses the library cpputest (http://cpputest.github.io/).
 
 The hardware has currently two wheels with motor and hall effect encoders.
 Additionally it has five infrared distance sensors and an acceleration sensor.
